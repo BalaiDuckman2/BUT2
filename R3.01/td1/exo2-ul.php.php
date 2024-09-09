@@ -97,6 +97,21 @@ $depts = [
    'Val-de-Marne',
    'Val-d\'Oise',
 ];
-
+   ?>
+   <table>
+      <?php
+      for ($i=0; $i < sizeof($depts); $i++) { 
+      ?>
+      <tr>
+      <td>
+         <?php echo($depts[$i]) ?>
+      </td>
+      </tr>
+      <?php
+      }
+      ?>  
+   
+   </table>
+   <?php
+   
 ?>
-<ul> </ul>

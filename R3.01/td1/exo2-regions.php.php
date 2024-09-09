@@ -1,4 +1,5 @@
 <?php
+require_once('/home/etuinfo/racorre/BUT2/R3.01/td1/regions.php');
 $depts = [
    '01' => ['Ain', 'Bourg-en-Bresse'],
    '02' => ['Aisne', 'Laon'],
@@ -98,20 +99,36 @@ $depts = [
    '95' => ['Val-d\'Oise', 'Cergy'],
 ];
 
+function trouve_region($code){
+   global $regions;
+   foreach ($regions as $key => $value) {
+      foreach ($value as $valeur) {
+         if($code==$valeur){
+            $fin=$key;
+         }
+      }
+   }
+   return $fin;
+}
 
+   
    ?>
-   <ul>
+     <table>
       <?php
       foreach ($depts as $key => $value) {
       ?>
-      <li>
-         <?php echo($value[0]." ".$key." ".$value[1]) ?>
-      </li> 
+      <tr>
+      <td><?php echo($value[0])?></td>
+      <td><?php echo($key)?></td>
+      <td><?php echo($value[1])?></td>
+      <td><?php echo(trouve_region($key))?></td>
+
+      </tr>
       <?php
+
       }
       ?>  
-   </ul>
-   
+   </table> 
    <?php
 
 ?>
