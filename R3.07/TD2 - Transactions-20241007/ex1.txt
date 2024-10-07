@@ -1,0 +1,29 @@
+Voici les verrous demandés à chaque étape :
+
+U1 t1 : START TRANSACTION
+
+Aucun verrou n'est encore demandé, la transaction démarre simplement.
+U2 t2 : START TRANSACTION
+
+Même chose, pas de verrou demandé.
+U1 t3 : SELECT classe FROM enfant WHERE nopers = 1
+
+U1 demande un verrou partagé (S) sur la ligne correspondant à nopers = 1, car elle lit la colonne classe.
+U2 t4 : UPDATE enfant SET classe = 'CM1_1' WHERE nopers = 1
+
+U2 demande un verrou exclusif (X) sur la même ligne (car elle modifie la colonne classe pour nopers = 1).
+U1 t5 : SELECT classe FROM enfant WHERE nopers = 1
+
+U1 demande à nouveau un verrou partagé (S) pour relire la colonne classe pour nopers = 1.
+U2 t6 : COMMIT
+
+U2 relâche tous ses verrous exclusifs (X) après avoir validé les modifications.
+U1 t7 : SELECT classe FROM enfant WHERE nopers = 1
+
+U1 demande un verrou partagé (S), car elle relit encore une fois la colonne classe.
+U1 t8 : COMMIT
+
+U1 relâche tous ses verrous.
+U1 t9 : SELECT classe FROM enfant WHERE nopers = 1
+
+U1 demande un verrou partagé (S) pour relire les données après la validation de la transaction.

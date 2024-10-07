@@ -1,0 +1,35 @@
+<?php
+
+    foreach ($regions as $nom => $dept) { 
+        if ($nom==$_GET['regions']) {
+            foreach ($dept as $numdep) {
+                ?>
+                <li>
+                <?php echo($numdep)?>    
+                </li>
+                <?php
+            }
+        }
+    }
+
+
+
+    
+    foreach ($depts as $num => $nom) { 
+        foreach ($nom as $key => $value) {
+            if (str_contains($value,$_GET['dep'])) {
+                    echo($value); 
+                }
+                   
+                
+            
+        }
+
+
+    }
+
+?>
+
+
+<ul>
+<?php
