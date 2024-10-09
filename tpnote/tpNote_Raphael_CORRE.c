@@ -145,7 +145,7 @@ int main() {
 
     ajouterProduit(&panier, "Pomme", 2.50, 5);
     ajouterProduit(&panier, "Banane", 1.00, 10);
-    ajouterProduit(&panier, "Orange", 3.00, 7);
+    ajouterProduit(&panier, "Orange", 3.00, 15);
 
     printf("Affichage du panier:\n");
     afficherPanier(panier);

@@ -1,23 +1,39 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $fichier =file('data.csv');
+    ?>
+    <table>
+        <caption><b>Classe de <?php echo($_POST['classe']); ?> <b></caption>
+    <?php
     foreach ($fichier as $value) {
-        $ligne =explode(';',$value,0);
-        
-        if($ligne[4]==$_POST['classe']){
-            echo($value);
+        $ligne =explode(';',$value);
+        if($ligne[4]==$_POST['classe'][0]){
+            ?>
+            <table>
+                
+                <tr>
+                    <td class="petit"><?php echo($ligne[5]);?></td>
+                    <td  class="grand"><b><?php echo($ligne[0]);?></b></td>
+                    <td class="grand"><?php echo($ligne[1]);?></td>
+                    <td rowspan="2"> <img class="img" src="avatars/<?php echo(substr($ligne[3],0,13)); ?>.png" alt=""></td>
+
+                </tr>
+                <tr>
+                    <td colspan="3"><?php echo($ligne[2]);?> </td>
+                </tr>                
+            </table>
+            
+            <?php
         }
             
             
             
     }
-    print_r($ligne);
+    ?>
+    </table>
+    <?php
+    
 }else{
-    
-    
-    
-
-
 ?>
 <!DOCTYPE html>
 <html>
@@ -33,9 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <option value="5ème">5ème</option>
             <option value="4ème">4ème</option>
             <option value="3ème">3ème</option>
-            <option value="Seconde">Seconde</option>
-            <option value="Première">Première</option>
-            <option value="Terminale">Terminale</option>
+            <option value="2">Seconde</option>
+            <option value="1">Première</option>
+            <option value="Terminal">Terminale</option>
         </select><br><br>
 
         
@@ -44,6 +60,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
 </body>
 </html>
-<?php 
+
+<?php
 }
 ?>
+<style>
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+  padding:0 10px ;
+  
+}
+.grand{
+    width: 150px;
+}
+.petit{
+    width: 5px;
+}
+
+.img{
+    height:80px;
+    padding:2px;
+}
+</style>

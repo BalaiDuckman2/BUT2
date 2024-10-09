@@ -21,14 +21,14 @@ if($_FILES['fichier']['name']==null){
 
     $fichier =file($_FILES['fichier']['tmp_name']);
     foreach ($fichier as $value) {
-        $ligne =explode(';',$value,0);
-        if(strlen($ligne[0])>40&&$ligne[0]=='H'||$ligne[0]=='F'){
+        $ligne =explode(';',$value);
+        if(strlen($ligne[0])>40&&$ligne[6]=='H'||$ligne[6]=='F'){
 
         }else{
             
             file_put_contents('data.csv', $value, FILE_APPEND);
             
-            
+                
             
     }
     
