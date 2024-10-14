@@ -7,7 +7,6 @@ int main()
     {
         printf("PID %d - Passage %d\n", getpid(), loop);
         sleep(1);
-        
-        }
+    }
     return 0;
 }

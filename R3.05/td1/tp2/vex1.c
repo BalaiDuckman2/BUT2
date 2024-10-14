@@ -18,12 +18,12 @@ void mon_action(int sig)
             printf("Nombre de CTRL+C atteint. Arrêt du programme.\n");
             exit(0);
         }
-    }else if (sig==SIGSTOP)
+    }
+    else if (sig == SIGSTOP)
     {
-        ctrlCCount=0;
+        ctrlCCount = 0;
         printf("Remise à zéro du compteur des CTRL+C.\n");
     }
-    
 }
 
 int main()

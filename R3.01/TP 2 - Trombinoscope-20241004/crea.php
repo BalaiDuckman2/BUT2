@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($_FILES['photo']['tmp_name'], $photo);
         
         $line = "$insee,$nom,$prenom,$email,$sexe,$classe\n";
-        file_put_contents('data.csv', $line, FILE_APPEND);
+            
         echo "<p>Fiche ajoutée avec succès !</p>";
     } else {
         foreach ($errors as $error) {
