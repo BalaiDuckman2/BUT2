@@ -1,22 +1,4 @@
-<?php
-include('connect_params.php');
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    try {
-    $dbh = new PDO("$driver:host=$server;dbname=$dbname", 
-            $user, $pass);
-    foreach($dbh->query('SELECT * from forum1._user', 
-                        PDO::FETCH_ASSOC) 
-                as $row) {
-        
-    }
-    } catch (PDOException $e) {
-        print "Erreur !: " . $e->getMessage() . "<br/>";
-        die();
-    }
-}else{
-
-?>
 
 
 
@@ -28,26 +10,38 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     <title>Création d'une offre</title>
 </head>
 <body>
+    
+    
     <img source="logo.png" alt="Logo">
     <h1>Créez votre Offre</h1>
+    <form action="creationOffre.php" method="get" enctype="multipart/form-data">
+        <label>Type d'offre</label><br>
+        <select name="typeOffre" placeholder="" required>
+            <option selected disabled></option>
+            <option value="Activite">Activite</option>
+            <option value="Visite">Visite</option>
+            <option value="Spectacle">Spectacle</option>
+            <option value="ParcAttraction">Parc d'attraction</option>
+            <option value="Restauration">Restauration</option>
+        </select><br>
+        <button type="submit">Valider</button><br><br>
+    </form>
+    
+    <?php
+    if($_GET["typeOffre"]!=null){
+    ?>
     <form method="post" action="creationOffre.php" enctype="multipart/form-data">
         <label>Type de forfait</label><br>
         <select name="typeForfait" required>
             <option value="Standard">Standard</option>
             <option value="Premium">Premium</option>
         </select>
-        <br>
+        <br><br>
 
-        <label>Type d'offre</label><br>
-        <select name="typeOffre" required>
-            <option value="Standard">Activite</option>
-            <option value="Premium">Visite</option>
-            <option value="Standard">Spectacle</option>
-            <option value="Premium">Parc d'attraction</option>
-            <option value="Premium">Restauration</option>
-        </select><br>
+        <label>Nom de l'offre</label><br>
+        <input type="text" name="nomOffre" autocomplete="off" required><br><br>
 
-        <label>Type d'offre</label><br>
+        <label>information de l'offre</label><br>
         <input type="text" name="ville" placeholder="Ville" required><br>
         <input type="number" name="codePostal" placeholder="code Postal" required><br>
         <input type="text" name="adressePostale" placeholder="Rue" required><br>
@@ -68,31 +62,65 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <input type="text" name="tags" required><br><br>
 
         <label>Photo</label><br>
-        <input type="file" name="photo" required><br><br>
+        <input type="file" name="photo[]" multiple="oui" required><br><br>
         <img src="" alt="">
         
 
         <label>Type de promotion de l'offre</label><br>
         <select name="typePromotion" required>
-            <option value="Aucune">Activite</option>
-            <option value="Relief">Visite</option>
-            <option value="aLaUne">Spectacle</option>
+            <option value="Aucune">Aucune</option>
+            <option value="Relief">Rekief</option>
+            <option value="aLaUne">A la une</option>
         </select><br><br>
-        
-        <label>Tarif minimum</label><br>
-        <input type="number" name="prix" required><br><br>
 
-        <label>Durée du spectacle</label><br>
-        <input type="time" name="tags" required><br><br>
-        <label>Capacité d'accueil</label><br>
-        <input type="number" name="tags" placeholder="Nombre de place" required><br><br>
 
-        <button >Annuler</button>
+        <?php if($_GET["typeOffre"]=="Activite"){?>
+            <label>Capacité d'accueil</label><br>
+            <input type="number" name="capacite" required><br><br>
+
+            <labe>Durée de l'activité</label><br>
+            <input type="number" name="duree" required><br><br>            
+
+
+        <?php }else if($_GET["typeOffre"]=="Visite"){?>
+            <label>Capacité d'accueil</label><br>
+            <input type="number" name="capacite" required><br><br>
+
+            <label>Durée de la visite</label><br>
+            <input type="number" name="duree" required><br><br>
+
+            <label>Visite guidée</label><br>
+            <input type="radio" id="true" name="guide" value="true">
+            <label for="oui">Oui</label><br>
+            <input type="radio" id="false" name="guide" value="false">
+            <label for="non">Non</abel><br>
+            
+
+        <?php }else if($_GET["typeOffre"]=="Spectacle"){?>
+            <label>Capacité d'accueil</label><br>
+            <input type="number" name="capacite" required><br><br>
+
+            <labe>Durée du spectacle</label><br>
+            <input type="number" name="duree" required><br><br>
+            
+
+        <?php }else if($_GET["typeOffre"]=="ParcAttraction"){?>
+            
+            <labe>Nombre d'attraction</label><br>
+            <input type="number" name="duree" required><br><br>
+
+            <labe>Age minimum</label><br>
+            <input type="number" name="duree" required><br><br>
+        <?php }else if($_GET["typeOffre"]=="Restauration"){?>
+            
+        <?php } ?>
         <button type="submit">Valider</button>
+        <a ><button href="http://localhost:8888/creationOffre.php" >Annuler</button><a>
+
     </form>
-    
+
+    <?php } ?>
     
 </body>
 </html>
 
-<?php }?>
