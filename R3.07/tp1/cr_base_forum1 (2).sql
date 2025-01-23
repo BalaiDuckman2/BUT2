@@ -1,121 +1,105 @@
-DROP SCHEMA IF EXISTS forum1 CASCADE;
+DROP SCHEMA IF EXISTS tp CASCADE;
 
-CREATE SCHEMA forum1;
+CREATE SCHEMA tp;
+SET SCHEMA 'tp';
 
-CREATE TABLE forum1._user(
-	nickname 	VARCHAR(30)	CONSTRAINT _user_pk PRIMARY KEY,
-	pass 		VARCHAR(20)	NOT NULL,
-	email 		VARCHAR(40)	NOT NULL
-);
- 
-CREATE TABLE forum1._document (
-	iddoc		SERIAL			CONSTRAINT _document_pk PRIMARY KEY, -- SERIAL pour auto-incrément
-	content		VARCHAR(128) 	NOT NULL, 
-	create_date	TIMESTAMP		NOT NULL DEFAULT now(), -- pas DATE, il faut etre precis
-	author		VARCHAR(30)		NOT NULL,
-	CONSTRAINT _document_fk_author
-		FOREIGN KEY (author) REFERENCES forum1._user(nickname)
-);		
+--CREATION DES TABLES
 
-CREATE TABLE forum1._post(
-	iddoc		INTEGER,
-	CONSTRAINT _post_pk PRIMARY KEY (iddoc),
-	CONSTRAINT _post_fk_inherit
-		FOREIGN KEY (iddoc) REFERENCES forum1._document(iddoc) 
+CREATE TABLE _judoka(
+	idJudoka		SERIAL			CONSTRAINT _judoka_pk PRIMARY KEY,
+	nom 		VARCHAR(20)	NOT NULL,
+	prenom 		VARCHAR(20)	NOT NULL,
+	age INTEGER not NULL,
+	poids DECIMAL not null,
+	victoires INTEGER,
+	defaites INTEGER
+	CONSTRAINT _poid
+		CHECK (poids >= 80)
+
 );
 
-CREATE TABLE forum1._comment(
-	iddoc		INTEGER,
-	ref			INTEGER	NOT NULL,
-	CONSTRAINT _comment_pk PRIMARY KEY (iddoc),
-	CONSTRAINT _comment_fk_inherit
-		FOREIGN KEY (iddoc) REFERENCES forum1._document(iddoc),
-	CONSTRAINT _comment_fk_ref
-		FOREIGN KEY (ref) REFERENCES forum1._document(iddoc),
-	CONSTRAINT _comment_ck_iddoc_ref
-		CHECK (iddoc <> ref)
+CREATE TABLE _senior(
+  idjudoka SERIAL CONSTRAINT _senior_pk PRIMARY KEY,
+  CONSTRAINT _senior_fk_judoka
+		FOREIGN KEY (idjudoka) REFERENCES _judoka(idJudoka)
+	);
+	
+CREATE TABLE _junior(
+  idjudoka SERIAL CONSTRAINT _junior_pk PRIMARY KEY,
+  CONSTRAINT _junior_fk_judoka
+		FOREIGN KEY (idjudoka) REFERENCES _judoka(idJudoka)
+	);
+  
+
+CREATE TABLE _combat(
+  idCombat SERIAL			CONSTRAINT _combat_pk PRIMARY KEY,
+  duree DECIMAL,
+  date_combat DATE NOT NULL,
+  idjudoka1 INTEGER NOT NULL,
+  idjudoka2 INTEGER NOT NULL,
+  idvainqueur INTEGER,
+  CONSTRAINT _combat_fk_judoka1
+		FOREIGN KEY (idjudoka1) REFERENCES _judoka(idJudoka),
+	CONSTRAINT _combat_fk_judoka2
+		FOREIGN KEY (idjudoka2) REFERENCES _judoka(idJudoka),
+	CONSTRAINT _combat_fk_vainqueur
+		FOREIGN KEY (idvainqueur) REFERENCES _judoka(idJudoka)
+  );
+  
+  
+
+CREATE TABLE _entrainement(
+  idjudoka INTEGER NOT NULL,
+  idsenior INTEGER NOT NULL,
+  CONSTRAINT _entrainement_fk_judoka
+		FOREIGN KEY (idjudoka) REFERENCES _judoka(idJudoka),
+	CONSTRAINT _entrainement_fk_senior
+		FOREIGN KEY (idsenior) REFERENCES _senior(idJudoka)
 );
 
----
---- Peuplement de la base
----
+--CREATION DE LA VUE
 
---- Premier utilisateur : virtuel, ne devrait pas pouvoir se connecter
-INSERT INTO forum1._user VALUES ('Anonymous', 'VGilo6VKjhcv', 'null@nowhere.space');
+CREATE OR REPLACE VIEW StatistiquesJudoka as
+SELECT idJudoka,nom,prenom,victoires,defaites
+FROM _judoka;
 
---- Les autres
-INSERT INTO forum1._user VALUES ('Félix', 'xilef', 'felix@gcris.fr');
-INSERT INTO forum1._user VALUES ('Arthur', 'ruhtra', 'arthur@gcris.fr');
-INSERT INTO forum1._user VALUES ('Jean', 'naej', 'jean@gcris.fr');
-INSERT INTO forum1._user VALUES ('Thomas', 'samoht', 'thomas@gcris.fr');
-INSERT INTO forum1._user VALUES ('Alex', 'xela', 'alex@gcris.fr');
+--CREATION DE LA FONCTION
 
---- Les posts et comments
---- Insister sur le fait qu'on ne doit pas creer de document en realite
---- Document ets une classe abstraite et on instancie un Post ou un Comment
---- Suite au prochain TP avec des vues post et comment et des triggers instead of
+CREATE OR REPLACE FUNCTION combatmax() RETURNS TRIGGER AS $$
+BEGIN
+  IF((SELECT COUNT(idCombat) FROM _combat where date_combat = new.date_combat)>=5) THEN
+    RAISE EXCEPTION 'Impossible déjà plus de 5 combat le meme jours';
+  END IF;
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql;
 
---- Les posts
+--CREATION DU TRIGGER
+CREATE TRIGGER combatmax
+BEFORE INSERT
+ON _combat
+FOR EACH ROW
+EXECUTE PROCEDURE combatmax();
 
-INSERT INTO forum1._document(iddoc, content, author) VALUES (1, 'Bonjour tout le monde !', 'Félix');
-INSERT INTO forum1._post(iddoc) VALUES (1);
+--TEST
 
-INSERT INTO forum1._document(iddoc, content, author) VALUES (2, 'Quelqu''un jouera encore au foot cette année ?', 'Arthur');
-INSERT INTO forum1._post(iddoc) VALUES (2);
-
---- Les comments
-INSERT INTO forum1._document(iddoc, content, author) VALUES (3, 'Salut Félix ! Tu vas bien ?', 'Arthur');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (3,1);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (4, 'Oui, merci. Et toi ?', 'Félix');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (4,3);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (5, 'Tiens, Félix, tu es rentré de vacances ?', 'Jean');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (5,1);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (6, 'Bonjour Félix ! Bonjour à tous', 'Thomas');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (6,1);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (7, 'Salut Thomas !', 'Jean');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (7,6);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (8, 'Hello Thomas ! Tu reprends le foot cette année ?', 'Arthur');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (8,6);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (11, 'Non, je vais me mettre au handball, je crois.', 'Thomas');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (11,8);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (12, 'Ah ? Dommage, on s''amusait bien ensemble.', 'Félix');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (12,8);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (9, 'Oui, moi !', 'Jean');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (9,2);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (10, 'Pas moi.', 'Thomas');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (10,2);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (13, 'Moi aussi', 'Félix');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (13,2);
-
-INSERT INTO forum1._document(iddoc, content, author) VALUES (14, 'Et moi !', 'Alex');
-INSERT INTO forum1._comment(iddoc, ref) VALUES (14,2);
-
---
--- Pour mettre la sequence à la bonne valeur après les insertions
-select setval('forum1._document_iddoc_seq', 14 );
-
-/*
--- Autre façon : enchainer les insert
-with insertion as (
-INSERT INTO forum1._document(content, author) 
-  VALUES ('Et moi !', 'Alex') RETURNING iddoc
-)
-insert into forum1._post select iddoc from insertion;
-
--- A condition de vérifier à chaque création qu'on commente le bon document
-with insertion as (
-INSERT INTO forum1._document(content, author) 
-  VALUES ('Et moi aussi !', 'Arthur') RETURNING iddoc
-)
-insert into forum1._comment(iddoc,ref) select iddoc,6 from insertion;
-*/
+START TRANSACTION;
+insert into _judoka VALUES(1,'corre','raphael',18,80,1,10);
+insert into _judoka VALUES(2,'jean','dupuit',40,85,3,4);
+INSERT into _senior VALUES(2);
+INSERT into _junior VALUES(1);
+insert into _combat VALUES(1,14,'14/10/2024',1,2,1);
+insert into _combat VALUES(2,20,'14/10/2024',1,2,1);
+insert into _entrainement VALUES(1,2);
+select * from _judoka;
+select * from _junior;
+select * from _senior;
+select * from _entrainement;
+select * from _combat;
+select * from StatistiquesJudoka;
+insert into _combat VALUES(3,30,'14/10/2024',1,2,1);
+insert into _combat VALUES(4,40,'14/10/2024',1,2,1);
+insert into _combat VALUES(5,50,'14/10/2024',1,2,1);
+insert into _combat VALUES(6,60,'14/10/2024',1,2,1);
+insert into _combat VALUES(7,70,'14/10/2024',1,2,1);
+ROLLBACK;

@@ -1,0 +1,130 @@
+Fiche de Révision : Les SELECT en SQL
+Structure de base
+sql
+Copier le code
+SELECT colonnes
+FROM table
+[WHERE condition]
+[GROUP BY colonnes]
+[HAVING condition]
+[ORDER BY colonnes [ASC | DESC]]
+[LIMIT n];
+1. Sélection de colonnes
+Toutes les colonnes : SELECT * FROM table;
+Colonnes spécifiques : SELECT colonne1, colonne2 FROM table;
+2. Conditions avec WHERE
+Comparaisons :
+= : égal
+!= ou <> : différent
+<, >, <=, >= : comparateurs
+Conditions multiples :
+AND : toutes les conditions doivent être vraies
+OR : au moins une condition vraie
+Rechercher une valeur dans une liste : IN
+sql
+Copier le code
+SELECT * FROM table WHERE colonne IN (valeur1, valeur2);
+Plages de valeurs : BETWEEN
+sql
+Copier le code
+SELECT * FROM table WHERE colonne BETWEEN valeur_min AND valeur_max;
+Modèle de texte : LIKE (wildcards : % pour plusieurs caractères, _ pour un seul)
+sql
+Copier le code
+SELECT * FROM table WHERE colonne LIKE 'abc%';
+Valeurs NULL :
+sql
+Copier le code
+SELECT * FROM table WHERE colonne IS NULL;
+3. Tri des résultats
+Ascendant (par défaut) :
+sql
+Copier le code
+SELECT * FROM table ORDER BY colonne ASC;
+Descendant :
+sql
+Copier le code
+SELECT * FROM table ORDER BY colonne DESC;
+4. Regroupement et agrégation
+GROUP BY : Regrouper les lignes ayant les mêmes valeurs pour certaines colonnes
+sql
+Copier le code
+SELECT colonne, COUNT(*) FROM table GROUP BY colonne;
+HAVING : Filtrer les groupes (après regroupement)
+sql
+Copier le code
+SELECT colonne, COUNT(*) 
+FROM table 
+GROUP BY colonne 
+HAVING COUNT(*) > 1;
+5. Fonctions d'agrégation
+COUNT(colonne) : Nombre de valeurs (non NULL)
+SUM(colonne) : Somme des valeurs numériques
+AVG(colonne) : Moyenne des valeurs numériques
+MIN(colonne) : Valeur minimale
+MAX(colonne) : Valeur maximale
+6. Joindre plusieurs tables
+INNER JOIN : Renvoie les lignes avec correspondance dans les deux tables
+sql
+Copier le code
+SELECT table1.colonne1, table2.colonne2
+FROM table1
+INNER JOIN table2 ON table1.cle = table2.cle;
+LEFT JOIN : Conserve toutes les lignes de la première table, même sans correspondance
+sql
+Copier le code
+SELECT table1.colonne1, table2.colonne2
+FROM table1
+LEFT JOIN table2 ON table1.cle = table2.cle;
+RIGHT JOIN : Conserve toutes les lignes de la deuxième table
+7. Limiter le nombre de résultats
+sql
+Copier le code
+SELECT * FROM table LIMIT 10;
+8. Sous-requêtes
+Utilisation dans les conditions :
+sql
+Copier le code
+SELECT * FROM table 
+WHERE colonne IN (SELECT colonne FROM autre_table);
+Utilisation comme colonne :
+sql
+Copier le code
+SELECT colonne, (SELECT COUNT(*) FROM autre_table) AS total
+FROM table;
+9. Alias
+Pour les colonnes :
+sql
+Copier le code
+SELECT colonne AS alias FROM table;
+Pour les tables :
+sql
+Copier le code
+SELECT t1.colonne, t2.colonne 
+FROM table1 AS t1 
+INNER JOIN table2 AS t2 ON t1.cle = t2.cle;
+Exemples Pratiques
+Trouver tous les employés dont le salaire est supérieur à 50 000 :
+
+sql
+Copier le code
+SELECT * FROM employes WHERE salaire > 50000;
+Nombre d’employés par département :
+
+sql
+Copier le code
+SELECT departement, COUNT(*) 
+FROM employes 
+GROUP BY departement;
+Les 5 meilleurs salaires :
+
+sql
+Copier le code
+SELECT * FROM employes ORDER BY salaire DESC LIMIT 5;
+Fusionner deux tables avec correspondance :
+
+sql
+Copier le code
+SELECT e.nom, d.nom_departement
+FROM employes e
+INNER JOIN departements d ON e.departement_id = d.id;

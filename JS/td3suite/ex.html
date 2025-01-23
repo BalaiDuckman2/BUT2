@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+   
+</head>
+<body>
+    <img id="monImage" src="non.jpg" onmouseover="permuterImage()">
+    <script>
+        let image = document.getElementById("monImage")
+        image.addEventListener("mouseover",permuterImage)
+        image.addEventListener("mouseout",permuterImage)
+        function permuterImage(){
+            if(image.src.match("oui.png")){
+                image.src="non.jpg";
+            }else{
+                image.src="oui.png";
+            }
+        }
+
+        
+
+
+    </script>
+    
+</body>
+</html>
